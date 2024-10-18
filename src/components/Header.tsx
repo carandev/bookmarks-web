@@ -4,7 +4,6 @@ import LogoutButton from "./auth/LogoutButton";
 import { useEffect } from "react";
 import UsersService from "../services/UsersService";
 import useUserStore from "../utils/useUserStore";
-import { Card } from "./ui/card";
 import { toast } from "sonner";
 import { ModeToggle } from "./utils/mode-toggle";
 
@@ -36,13 +35,15 @@ const Header = () => {
   }, [isAuthenticated]);
 
   return (
-    <Card className="flex justify-between items-center p-4 rounded-none">
-      <h1>Marcadores Web {currentUser && "para " + currentUser?.name}</h1>
+    <header className="flex justify-between items-center p-4 rounded-none">
+      <h1 className="text-2xl">
+        Marcadores Web {currentUser && "para " + currentUser?.name}
+      </h1>
       <div className="flex gap-4">
         <ModeToggle />
         {isAuthenticated ? <LogoutButton /> : <LoginButton />}
       </div>
-    </Card>
+    </header>
   );
 };
 

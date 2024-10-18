@@ -28,6 +28,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import CreateBookmarkRequest from "@/data/requests/CreateBookmarkRequest";
 import useUserStore from "@/utils/useUserStore";
+import userForm from "@/data/forms/user-form";
+import { Trash } from "lucide-react";
 
 const Bookmarks = () => {
   const { isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
@@ -36,18 +38,15 @@ const Bookmarks = () => {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const bookmarkService = new BookmarkService();
-  const formSchema = z.object({
-    title: z.string().min(2).max(50),
-    url: z.string().min(2).max(50),
-  });
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+
+  const form = useForm<z.infer<typeof userForm>>({
+    resolver: zodResolver(userForm),
     defaultValues: {
       title: "",
       url: "",
     },
   });
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof userForm>) => {
     try {
       const createBookmarkRequest: CreateBookmarkRequest = {
         title: values.title,
@@ -96,72 +95,77 @@ const Bookmarks = () => {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <Card className="m-4">
-        <CardHeader className="justify-between items-center">
-          <h2>Mis marcadores</h2>
-          <DialogTrigger>Crear marcador</DialogTrigger>
-        </CardHeader>
-        <CardContent className="flex gap-4">
+    <main className="max-w-6xl mx-auto">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <div className="flex justify-between">
+          <h2 className="text-2xl">Mis marcadores</h2>
+          <Button asChild>
+            <DialogTrigger>Crear marcador</DialogTrigger>
+          </Button>
+        </div>
+        <section className="flex gap-4 justify-around mt-8">
           {bookmarks.length != 0 ? (
             bookmarks.map((bookmark) => (
-              <Card key={bookmark.id}>
+              <Card key={bookmark.id} className="relative">
                 <CardHeader>{bookmark.title}</CardHeader>
                 <CardContent>{bookmark.url}</CardContent>
+                <Button size="icon" variant="destructive" className="absolute -top-5 -right-2">
+                  <Trash />
+                </Button>
               </Card>
             ))
           ) : (
             <p>No hay marcadores registrados</p>
           )}
-        </CardContent>
-      </Card>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Registrar marcador</DialogTitle>
-          <DialogDescription>
-            Aquí puedes registrar un nuevo marcador indicando el título y la
-            URL.
-          </DialogDescription>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Título</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Mi marcador" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    El título que identificará tu marcador.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://..." {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    La URL a la que apunta tu marcador.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit">Guardar</Button>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+        </section>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Registrar marcador</DialogTitle>
+            <DialogDescription>
+              Aquí puedes registrar un nuevo marcador indicando el título y la
+              URL.
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Título</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Mi marcador" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      El título que identificará tu marcador.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://..." {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      La URL a la que apunta tu marcador.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit">Guardar</Button>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    </main>
   );
 };
 
